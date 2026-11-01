@@ -25,21 +25,30 @@ const taskList = document.querySelector("#task-list");
 const select = document.querySelector("#priority-select");
 
 // אירועים לאלמנטים
-form.addEventListener("submit", addTask)
+form.addEventListener("submit", addTask);
+taskList.addEventListener("click", markCompleted);
 
 // פונקציות
 // הוספת משימה
-function addTask(event){
+function addTask(event) {
     event.preventDefault();
-    if (!taskInput.value.trim()){
+    if (!taskInput.value.trim()) {
         error.textContent = 'Please type a task';
         error.classList.remove("hidden");
     }
-    else{
+    else {
         createTask();
         error.classList.add("hidden");
         taskInput.value = "";
         taskInput.focus();
+    }
+}
+
+function markCompleted(event) {
+    let task = event.target.closest("li");
+
+    if (task && taskList.contains(task)) {
+        task.classList.toggle("done");
     }
 }
 
@@ -50,9 +59,8 @@ function addTask(event){
 
 
 
-
 // יצירת משימה
-function createTask(){
+function createTask() {
     let task = document.createElement("li");
     task.classList.add("priority-" + select.value);
     let span = document.createElement("span");
