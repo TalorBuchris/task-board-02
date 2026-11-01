@@ -23,12 +23,23 @@ const error = document.querySelector("#error");
 const taskInput = document.querySelector("#task-input");
 const taskList = document.querySelector("#task-list");
 const select = document.querySelector("#priority-select");
+const left = document.querySelector("#left");
+const clearDone = document.querySelector("#clear-done");
 
 // אירועים לאלמנטים
 form.addEventListener("submit", addTask);
-taskList.addEventListener("click", markCompleted);
+taskList.addEventListener("click", (event) => {
+    if (event.target.closest("button")) {
+        removeTask(event);
+    } else {
+        markCompleted(event);
+    }
+});
+clearDone.addEventListener("click", clearCompleted);
 
 // פונקציות
+checkEmpty();
+
 // הוספת משימה
 function addTask(event) {
     event.preventDefault();
@@ -41,23 +52,57 @@ function addTask(event) {
         error.classList.add("hidden");
         taskInput.value = "";
         taskInput.focus();
+        countTasks();
     }
+    checkEmpty();
 }
 
+// סימון כבוצעה
 function markCompleted(event) {
     let task = event.target.closest("li");
 
     if (task && taskList.contains(task)) {
         task.classList.toggle("done");
+        countTasks();
     }
 }
 
+// מחיקת משימה
+function removeTask(event) {
+    let button = event.target.closest("button");
+    if (button) {
+        let task = button.closest("li");
+        if (task && taskList.contains(task)) {
+            task.remove();
+            countTasks();
+            checkEmpty();
+        }
+    }
+}
 
+// מונה משימות
+function countTasks() {
+    const tasks = taskList.querySelectorAll("li");
+    let count = [...tasks].filter(one => !one.classList.contains('done')).length;
+    left.textContent = count;
+}
 
+// מחיקת המשימות שבוצעו
+function clearCompleted() {
+    const tasks = taskList.querySelectorAll("li");
+    tasks.forEach((item) => {
+        if (item.classList.contains('done'))
+            item.remove();
+    })
+    checkEmpty();
+}
 
-
-
-
+// הודעת רשימה ריקה
+function checkEmpty() {
+    const empty = document.querySelector("#empty");
+    const tasks = taskList.querySelectorAll("li");
+    empty.hidden = tasks.length != 0;
+}
 
 // יצירת משימה
 function createTask() {
