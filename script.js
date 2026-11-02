@@ -25,6 +25,7 @@ const taskList = document.querySelector("#task-list");
 const select = document.querySelector("#priority-select");
 const left = document.querySelector("#left");
 const clearDone = document.querySelector("#clear-done");
+const filters = document.querySelector("#filters");
 
 // אירועים לאלמנטים
 form.addEventListener("submit", addTask);
@@ -36,6 +37,7 @@ taskList.addEventListener("click", (event) => {
     }
 });
 clearDone.addEventListener("click", clearCompleted);
+filters.addEventListener("click", filterTasks);
 
 // פונקציות
 checkEmpty();
@@ -53,8 +55,11 @@ function addTask(event) {
         taskInput.value = "";
         taskInput.focus();
         countTasks();
+        checkEmpty();
+        const btn = document.querySelector('button[data-filter="done"]');
+        if (btn.classList.contains("active"))
+            filterPerBtn("done");
     }
-    checkEmpty();
 }
 
 // סימון כבוצעה
@@ -64,6 +69,11 @@ function markCompleted(event) {
     if (task && taskList.contains(task)) {
         task.classList.toggle("done");
         countTasks();
+        const btn = filters.querySelectorAll('button');
+        btn.forEach((item) => {
+            if (item.classList.contains('active'))
+                filterPerBtn(item.dataset.filter)
+        })
     }
 }
 
@@ -104,6 +114,24 @@ function checkEmpty() {
     empty.hidden = tasks.length != 0;
 }
 
+// סינון משימות
+function filterTasks(event) {
+    // בדיקה אם נלחץ כפתור באמת
+    const button = event.target.closest("button");
+    if (!button)
+        return;
+
+    // הפיכת הכפתור המתאים לפעיל
+    const buttons = filters.querySelectorAll("button");
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add("active");
+
+    // הגדרת הפעולה המתאימה עבור כל כפתור
+    const filter = button.dataset.filter;
+    filterPerBtn(filter)
+}
+
+// פונקציות עזר
 // יצירת משימה
 function createTask() {
     let task = document.createElement("li");
@@ -117,4 +145,35 @@ function createTask() {
     task.appendChild(span);
     task.appendChild(button)
     taskList.appendChild(task)
+}
+
+// סינון המשימות לפי הכפתור הפעיל
+function filterPerBtn(filter) {
+    const allTasks = taskList.querySelectorAll("li");
+    switch (filter) {
+        case "all":
+            // הצגת כל המשימות
+            allTasks.forEach(item => item.hidden = false)
+            break;
+
+        case "active":
+            // הצגת משימות שלא הושלמו
+            allTasks.forEach((item) => {
+                if (item.classList.contains('done'))
+                    item.hidden = true;
+                else
+                    item.hidden = false;
+            })
+            break;
+
+        case "done":
+            // הצגת משימות שהושלמו
+            allTasks.forEach((item) => {
+                if (!item.classList.contains('done'))
+                    item.hidden = true;
+                else
+                    item.hidden = false;
+            })
+            break;
+    }
 }
