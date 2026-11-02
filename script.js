@@ -47,11 +47,11 @@ function addTask(event) {
     event.preventDefault();
     if (!taskInput.value.trim()) {
         error.textContent = 'Please type a task';
-        error.classList.remove("hidden");
+        error.hidden = false;
     }
     else {
         createTask();
-        error.classList.add("hidden");
+        error.hidden = true;
         taskInput.value = "";
         taskInput.focus();
         countTasks();
